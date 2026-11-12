@@ -1,0 +1,9 @@
+{
+  "max_absolute_force_difference_N": 0.03498876140520224,
+  "time_of_max_difference_s": 1.075,
+  "reference_force_at_max_difference_N": 1020.5810287387186,
+  "fitted_force_at_max_difference_N": 1020.5460399773134,
+  "max_difference_percent_of_reference_peak": 0.0030860624353438895,
+  "relative_sample_vector_norm": 1.9620646512986303e-05,
+  "norm_note": "Euclidean norm over matching time samples; not a continuous-time integral."
+}

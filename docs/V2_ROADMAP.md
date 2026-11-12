@@ -19,7 +19,7 @@ the complete high-order thermo-viscoplastic method in the source paper.
 Candidate enrichment and automatic reference-integration error control remain
 potential extensions. The current method inherits the quadtree geometry error.
 
-## V3: isothermal viscoplasticity
+## Implemented in V3
 
 1. Verify a material-point model under loading, unloading, and different rates.
 2. Add load increments, nonlinear equilibrium iterations, and trial/committed history.
@@ -27,13 +27,19 @@ potential extensions. The current method inherits the quadtree geometry error.
 4. Measure reaction curves, plastic strain, iteration counts, history storage,
    and total runtime.
 
+Completed material-point relaxation, rate, and time-step studies; analytical
+and numerical tangent checks; plane-stress condensation; uniform rectangle
+verification; nonlinear plate comparisons; and fictitious-stiffness sensitivity.
+History counts are recorded, while actual memory bytes remain unmeasured.
+See [V3 results and reproduction commands](V3_RESULTS.md).
+
 ## Further research features
 
 1. High-order integrated-Legendre basis with p-convergence verification.
 2. Hierarchical overlay refinement and gradient-jump error indicators.
 3. Linear thermoelasticity with a verified stationary conduction problem.
-4. J2 plasticity with material-point tests and a consistent tangent.
-5. Rate dependence and temperature-dependent properties.
+4. Robust nonlinear globalization and automatic time-step reduction.
+5. Temperature-dependent properties and calibrated material parameters.
 
 Each feature needs its own independent verification before combined benchmarks.
 Further features will follow independent verification of the mechanical model.

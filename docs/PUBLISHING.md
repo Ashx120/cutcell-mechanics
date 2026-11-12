@@ -32,11 +32,11 @@ from the tracked files and must be configured on GitHub.
 
 ## Creating a versioned release
 
-The package currently targets version `0.3.0`. Once that milestone is accepted,
-move its changelog entries from Unreleased to a dated release heading, add the
-actual release version and date to `CITATION.cff`, and commit those updates.
-Create a corresponding Git tag and GitHub release from the reviewed default
-branch. Retain earlier tags, including the original `v1.0.0` milestone.
+The v3 source baseline is recorded as version `0.3.0` in the package, changelog,
+and citation metadata. For later milestones, move changelog entries from
+Unreleased to a dated heading and update the version and citation metadata before
+tagging the reviewed commit. A GitHub release page is a separate publishing step.
+Retain earlier tags, including the original `v1.0.0` milestone.
 
 Release notes should state the new numerical behaviour, reproducible commands,
 verification results, migration of the elastic playground, and known limitations.

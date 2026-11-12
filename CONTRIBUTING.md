@@ -7,8 +7,8 @@ an issue to describe the equations, assumptions, and intended verification first
 
 ## Development setup
 
-Fork the repository, clone your fork, and create a branch from the intended base.
-Until the v3 work is merged, its development base is `v3-viscoplasticity`.
+Fork the repository, clone your fork, and create a branch from `main`.
+Use the relevant development branch when contributing to an active milestone.
 
 ```powershell
 python -m venv .venv

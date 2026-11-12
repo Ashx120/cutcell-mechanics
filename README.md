@@ -30,8 +30,6 @@ Run these PowerShell commands once:
 ```powershell
 git clone https://github.com/Ashx120/cutcell-mechanics.git
 cd cutcell-mechanics
-# Until v3 is merged into main, select its branch.
-git switch v3-viscoplasticity
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -e ".[dev]"
 .\.venv\Scripts\python.exe -m pytest -q

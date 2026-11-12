@@ -1,9 +1,11 @@
 # Changelog
 
-User-facing changes are grouped by development milestone. The package metadata
-currently targets 0.3.0. A GitHub release for that version has not been published.
+User-facing changes are grouped by source release and development milestone.
+Version 0.3.0 records the verified v3 source baseline.
 
-## Unreleased — V3 / 0.3.0
+## Unreleased
+
+## [0.3.0] - 2026-11-12
 
 ### Added
 

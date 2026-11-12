@@ -1,0 +1,25 @@
+name: Bug report
+description: Report a reproducible numerical or usability problem.
+title: "[Bug] "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Expected and observed behaviour
+      description: Include units and the numerical quantity affected where applicable.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction
+      description: Include the command, edited playground settings or JSON inputs, and relevant output.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include OS, Python version, dependency versions, and Git commit or branch.
+    validations:
+      required: true

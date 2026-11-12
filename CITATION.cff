@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this code or its results, please cite this software and identify the commit used."
+type: software
+title: "CutCell Mechanics"
+authors:
+  - family-names: Gupta
+    given-names: Shrey
+repository-code: "https://github.com/Ashx120/immersed-elasticity"
+url: "https://github.com/Ashx120/immersed-elasticity"
+license: MIT
+abstract: >-
+  A research portfolio implementation of Q4 immersed plane-stress elasticity
+  and isothermal J2 Perzyna viscoplasticity, comparing adaptive quadtree and
+  non-negative moment-fitted quadrature through reproducible verification studies.
+keywords:
+  - computational mechanics
+  - finite elements
+  - viscoplasticity
+  - moment fitting

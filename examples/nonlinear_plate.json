@@ -1,0 +1,30 @@
+{
+  "geometry": {
+    "nx": 6,
+    "ny": 6,
+    "length": 4.0,
+    "height": 4.0,
+    "radius": 1.0
+  },
+  "material": {
+    "young": 210000.0,
+    "poisson": 0.3,
+    "initial_yield": 250.0,
+    "saturation_increment": 100.0,
+    "hardening_rate": 20.0,
+    "relaxation_time": 100.0,
+    "rate_exponent": 1.0
+  },
+  "thickness": 1.0,
+  "loading": {
+    "peak_displacement": 0.012,
+    "loading_time": 1.0,
+    "hold_time": 1.0,
+    "steps_per_phase": 10
+  },
+  "quadrature": {
+    "method": "quadtree",
+    "depth": 2,
+    "alpha": 0.000001
+  }
+}

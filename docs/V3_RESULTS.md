@@ -57,12 +57,23 @@ two-second hold, and one-second return to zero strain.
 .\.venv\Scripts\python.exe -m pytest -q
 ```
 
-The suite contains 30 tests across all versions. V3 checks include an analytical
+The suite contains 38 tests across all versions. V3 checks include an analytical
 backward-Euler result for perfect viscoplasticity with m=1, elastic and hydrostatic
 limits, relaxation, elastic unloading, tangent agreement under mixed loading and
 nonzero history, plane-stress enforcement, uniform-rectangle agreement with a
 material point, rollback after failure, cut-cell elastic agreement with v1,
 separate-region moment preservation, and fitting fallback.
+
+The usability revision makes the root `playground.py` the primary editable v3
+entry point. Geometry, material, loading, quadrature, and output settings live
+together there. The original elastic playground is at `scripts/elastic_playground.py`.
+Optional JSON inputs in `examples/nonlinear_plate.json`, `--config` support with
+CLI overrides, saved resolved `settings.json`,
+progress reporting, and protection against overwriting an existing run without
+`--overwrite`. Additional regression tests exercise the command-line workflow,
+custom rectangular geometry and phase durations, legacy snapshots, and input
+validation. The saved numerical studies below precede that workflow revision.
+Their fixed reference settings and material algorithm are preserved.
 
 The uniform rectangle is an integration check against the same constitutive
 implementation. The closed-form material test and numerical tangent derivatives
@@ -139,8 +150,8 @@ plotting. No general speedup guarantee follows from these measurements.
 The saved reference snapshots live in `results/v3/`. Rerun experiments in
 `results/walkthrough/` to retain the published snapshots. CSV files contain the
 full reaction histories and final physical-point strain samples; JSON files
-contain parameters, counts, and timing metadata. The playground remains the
-linear-elastic interface; use `nonlinear_plate.py` for v3.
+contain parameters, counts, and timing metadata. The root playground uses this
+same nonlinear analysis runner; the advanced commands remain reproducible.
 
 ## Fictitious-stiffness sensitivity
 

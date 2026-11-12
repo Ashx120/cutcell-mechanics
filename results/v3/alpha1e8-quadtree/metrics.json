@@ -1,0 +1,32 @@
+{
+  "method": "quadtree",
+  "mesh_n": 16,
+  "depth": 3,
+  "steps_per_phase": 40,
+  "alpha": 1e-08,
+  "thickness_mm": 1.0,
+  "plate_side_mm": 4.0,
+  "hole_radius_mm": 1.0,
+  "peak_displacement_mm": 0.012,
+  "material": {
+    "young": 210000.0,
+    "poisson": 0.3,
+    "initial_yield": 250.0,
+    "saturation_increment": 100.0,
+    "hardening_rate": 20.0,
+    "relaxation_time": 100,
+    "rate_exponent": 1.0
+  },
+  "integration_points": 1628,
+  "physical_history_points": 1227,
+  "allocated_history_slots": 1628,
+  "fallback_cells": 0,
+  "plane_stress_updates": 358284,
+  "global_evaluations": 292,
+  "setup_seconds": 0.08540250000078231,
+  "solve_seconds": 208.46115719999943,
+  "python": "3.12.14",
+  "numpy": "2.5.4",
+  "history_storage_note": "Fictitious points retain empty state placeholders; counts are not measured memory bytes.",
+  "timing_note": "Single run; setup includes rules, B matrices, and initial history. Solve includes all increments, Newton assembly and solves, and console reporting; excludes plotting."
+}

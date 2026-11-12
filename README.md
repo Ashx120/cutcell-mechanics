@@ -13,6 +13,13 @@ cut-domain area integration, and convergence of the immersed solution.
 integration points from 2,384 to 1,027 while preserving the Q4 solution to
 floating-point precision. Cached-rule integration timings are reported below.
 
+**V3 adds history-dependent mechanics.** An isothermal plane-stress J2 Perzyna
+solver compares both quadrature methods through a loading-and-hold experiment.
+On the tested plate, fitting reduced physical history points by 17% and material
+wrapper calls by 18%, with a maximum reaction-history difference of 0.0031% of
+the reference peak force. See [the v3 walkthrough and results](docs/V3_RESULTS.md)
+for reproduction commands, individual runtime observations, and limitations.
+
 ![Computed displacement, stress, and error](results/fields.png)
 
 ## Motivation and relationship to the paper
@@ -154,8 +161,10 @@ sample values; these plotting samples are not the assembly quadrature points.
 
 ## Verification and results
 
-Run `python -m pytest -q` in the configured environment. Thirteen tests currently
-pass, including moment preservation, compressed Q4 stiffness, same-mesh solution
+Run `python -m pytest -q` in the configured environment. Thirty tests currently
+pass, including the v3 constitutive, tangent, plane-stress, and incremental-solver
+checks described in [the v3 results](docs/V3_RESULTS.md), plus moment preservation,
+compressed Q4 stiffness, same-mesh solution
 agreement, and the fallback from a failed fit. Three parameterized checks reject
 invalid material properties.
 
@@ -291,14 +300,24 @@ src/immersed_elasticity/
     moment_fitting.py   Non-negative polynomial moment fitting
     reference.py        Analytical Kirsch stresses and boundary tractions
     benchmark.py        Experiments, metrics, and figures
+    viscoplasticity.py  3D J2 material update and analytical tangent
+    plane_stress.py    Local thickness-strain solve and tangent condensation
+    nonlinear_solver.py  Incremental equilibrium and integration-point history
 tests/                  Physical and numerical verification
 scripts/run_benchmark.py
 scripts/fit_one_cell.py
 scripts/compare_quadrature.py
 scripts/time_quadrature.py
+scripts/material_point.py
+scripts/check_material_tangent.py
+scripts/check_plane_stress.py
+scripts/nonlinear_rectangle.py
+scripts/nonlinear_plate.py
+scripts/compare_nonlinear_histories.py
 playground.py           User-editable model settings and plots
 results/                Reproducible example output
 docs/V2_ROADMAP.md       Deferred paper features
+docs/V3_RESULTS.md       Nonlinear model, verification, results, and limits
 ```
 
 ## Limitations and next release
@@ -310,9 +329,12 @@ solver, or plasticity. Boundary load quadrature is intended for
 uncut straight outer edges. It is a research portfolio solver rather than an
 industrial analysis package.
 
-V2 provides moment fitting on the verified linear-elastic baseline. The next
-planned stage is material-point verification and isothermal viscoplasticity.
-See [the development roadmap](docs/V2_ROADMAP.md).
+V2 provides moment fitting on the verified linear-elastic baseline. V3 extends it
+to isothermal viscoplasticity with separate compression of physical and fictitious
+regions. Its global Newton solver uses fixed increments and raises an exception
+on failed convergence. Local strain maxima remain incompletely converged, and
+timings are individual-run observations. See [the v3 limits](docs/V3_RESULTS.md)
+and [the development roadmap](docs/V2_ROADMAP.md).
 
 ## License
 

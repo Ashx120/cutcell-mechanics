@@ -2,7 +2,7 @@
 
 **Verified immersed finite-element analysis with moment-fitted quadrature.**
 
-[![Verification](https://github.com/Ashx120/immersed-elasticity/actions/workflows/tests.yml/badge.svg)](https://github.com/Ashx120/immersed-elasticity/actions/workflows/tests.yml)
+[![Verification](https://github.com/Ashx120/cutcell-mechanics/actions/workflows/tests.yml/badge.svg)](https://github.com/Ashx120/cutcell-mechanics/actions/workflows/tests.yml)
 [![Python](https://img.shields.io/badge/Python-3.11%2B-blue)](pyproject.toml)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
@@ -28,8 +28,8 @@ Use Python **3.11+**, Git, and a terminal. Recorded runs use Python 3.12 on Wind
 Run these PowerShell commands once:
 
 ```powershell
-git clone https://github.com/Ashx120/immersed-elasticity.git
-cd immersed-elasticity
+git clone https://github.com/Ashx120/cutcell-mechanics.git
+cd cutcell-mechanics
 # Until v3 is merged into main, select its branch.
 git switch v3-viscoplasticity
 python -m venv .venv
@@ -247,7 +247,7 @@ referenced paper retain their respective licenses.
 For bugs, include the input settings, exact command, output, environment, and
 commit used. Numerical feature proposals should include a verification strategy.
 See [CONTRIBUTING.md](CONTRIBUTING.md) and the
-[issue templates](https://github.com/Ashx120/immersed-elasticity/issues/new/choose).
+[issue templates](https://github.com/Ashx120/cutcell-mechanics/issues/new/choose).
 
 [CITATION.cff](CITATION.cff) provides software attribution. Cite the specific Git
 commit for reproducible use, and cite the source paper separately when discussing

@@ -1,8 +1,9 @@
-# Immersed Elasticity: a Verified Plate-with-Hole Solver
+# Immersed Elasticity: Elastic and Viscoplastic Plate Analysis
 
-A Python implementation of 2D, small-strain plane-stress elasticity on a Cartesian
-background mesh. A circular hole cuts through bilinear quadrilateral elements;
-adaptive quadtree quadrature integrates the material without a body-fitted mesh.
+A Python implementation of 2D small-strain, plane-stress analysis on a Cartesian
+background mesh, supporting linear elasticity and isothermal J2 Perzyna
+viscoplasticity. A circular hole cuts through bilinear quadrilateral elements.
+Quadtree integration and non-negative moment fitting handle the cut geometry.
 
 **V1 result:** the relative stress L2 error decreases from **7.88% to 2.29%** under
 mesh refinement, using an exact analytical stress reference. The verification
@@ -20,7 +21,7 @@ wrapper calls by 18%, with a maximum reaction-history difference of 0.0031% of
 the reference peak force. See [the v3 walkthrough and results](docs/V3_RESULTS.md)
 for reproduction commands, individual runtime observations, and limitations.
 
-![Computed displacement, stress, and error](results/fields.png)
+![V3 nonlinear reaction-history comparison](results/v3/comparison/reaction_comparison.png)
 
 ## Motivation and relationship to the paper
 
@@ -28,17 +29,19 @@ Inspired by Schmäke, Wege, and Ruess, *Efficient Thermo-Viscoplastic Analysis U
 a Multi-Level hp-Finite Cell Method with Non-Negative Moment Fitting*,
 [arXiv:2604.15921v2](https://arxiv.org/abs/2604.15921v2).
 
-This repository is an independent educational implementation of a **simplified
-immersed linear-elastic baseline**. It is not a full replication, and its results
-are not reproductions of the paper's figures or plasticity benchmarks.
+This repository independently implements selected immersed-discretization,
+quadrature, and isothermal constitutive ideas from the paper. The elastic Kirsch
+benchmark and nonlinear loading-and-hold experiment provide reproducible
+verification and method comparisons. The full thermo-viscoplastic, high-order,
+adaptively refined formulation remains a further extension.
 
-| Feature | V1 | V2 | Later extensions |
+| Feature | V1 | V2 | V3 |
 |---|---|---|---|
-| Approximation | Bilinear Q4, plane stress | Bilinear Q4, plane stress | High-order basis |
-| Geometry integration | Adaptive quadtree + Gauss quadrature | Selectable quadtree or non-negative moment fitting | Further integration strategies |
-| Mesh refinement | Uniform background-grid refinement | Uniform background-grid refinement | Hierarchical overlay refinement |
-| Material | Isotropic linear elasticity | Isotropic linear elasticity | Isothermal viscoplasticity, then thermal coupling |
-| Reference | Exact Kirsch stress | Same exact Kirsch stress | Additional engineering benchmarks |
+| Approximation | Q4 plane stress | Q4 plane stress | Q4 with local nonlinear plane-stress enforcement |
+| Integration | Adaptive quadtree | Quadtree or moment fitting | Fixed rules, separate physical/fictitious fits |
+| Material | Linear elastic | Linear elastic | J2 Perzyna viscoplasticity and saturation hardening |
+| Solution | Linear system | Linear system | Incremental Newton equilibrium with committed history |
+| Checks | Exact Kirsch field | Moment/stiffness and cost comparisons | Material tests, tangent checks, sensitivity studies, and nonlinear quadrature comparisons |
 
 ## Run locally
 
@@ -95,7 +98,7 @@ plot instead measures stress error against the exact Kirsch solution.
 
 ### V2 quadrature experiments
 
-On the v2 branch, select `method="moment-fitting"` in the playground's
+Select `method="moment-fitting"` in the playground's
 `QUADRATURE` settings, or use `--method moment-fitting` for the benchmark:
 
 ```powershell
@@ -118,7 +121,54 @@ as candidates and preserving polynomial moments through degree two per coordinat
 It inherits the reference rule's geometry approximation. The full-plate comparison
 and fallback behavior are covered by tests.
 
-## Engineering model
+### V3 nonlinear walkthrough
+
+Start with a material point, then verify its tangent, plane-stress reduction,
+and integration into the uniform rectangle:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/material_point.py
+.\.venv\Scripts\python.exe scripts/check_material_tangent.py
+.\.venv\Scripts\python.exe scripts/check_plane_stress.py
+.\.venv\Scripts\python.exe scripts/nonlinear_rectangle.py
+```
+
+For the plate, increase right-edge displacement to 0.012 mm over one second,
+then hold it for one second. Compare both methods on identical meshes and time
+steps using the following commands. Each solve can take several minutes.
+
+```powershell
+.\.venv\Scripts\python.exe scripts/nonlinear_plate.py --method quadtree --mesh 16 --depth 3 --steps 40 --output results/walkthrough/v3-quadtree
+.\.venv\Scripts\python.exe scripts/nonlinear_plate.py --method moment-fitting --mesh 16 --depth 3 --steps 40 --output results/walkthrough/v3-fitted
+.\.venv\Scripts\python.exe scripts/compare_nonlinear_histories.py
+```
+
+Outputs include reaction histories, final strain samples, plots, and JSON run
+settings and workload metrics. `--steps` sets increments per one-second phase;
+`--depth` controls cut-cell quadrature subdivision; `--alpha` sets the weak
+fictitious stiffness. Give each experiment a distinct `--output` folder.
+The playground is the linear-elastic interface. The nonlinear scripts define
+their illustrative material parameters explicitly.
+
+| V3 result on the tested 16 x 16 plate | Quadtree | Moment fitting |
+|---|---:|---:|
+| Physical history points | 1227 | 1019 |
+| Plane-stress updates | 359511 | 294491 |
+| Right-edge force at 1 s | 1133.767 N | 1133.736 N |
+| Right-edge force at 2 s | 792.224 N | 792.245 N |
+
+The largest reaction difference across the sampled history is 0.034989 N,
+or 0.003086% of the quadtree peak. Fitting reduces physical history points by
+17% and wrapper calls by 18%. Saved individual runs showed roughly 19-21%
+shorter solve time; repeated paired timing trials remain future work. History
+point counts are recorded rather than measured memory bytes.
+
+The [v3 report](docs/V3_RESULTS.md) includes the material equations, time/mesh
+studies, alpha sensitivity for both methods, saved data, and remaining limits.
+Local strain maxima remain incompletely converged. The paper's thermal coupling
+and high-order adaptive refinement are further extensions.
+
+## Linear-elastic verification model
 
 The physical quarter-domain is `[0,4] x [0,4] mm` outside a hole of radius `1 mm`
 at the origin. Material parameters are `E = 210000 MPa`, `nu = 0.3`, and thickness

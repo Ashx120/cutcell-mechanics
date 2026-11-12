@@ -18,10 +18,10 @@ dependencies = ["numpy>=1.26", "scipy>=1.11", "matplotlib>=3.8"]
 dev = ["pytest>=8"]
 
 [project.urls]
-Repository = "https://github.com/Ashx120/immersed-elasticity"
-Issues = "https://github.com/Ashx120/immersed-elasticity/issues"
-Documentation = "https://github.com/Ashx120/immersed-elasticity#readme"
-Changelog = "https://github.com/Ashx120/immersed-elasticity/blob/main/CHANGELOG.md"
+Repository = "https://github.com/Ashx120/cutcell-mechanics"
+Issues = "https://github.com/Ashx120/cutcell-mechanics/issues"
+Documentation = "https://github.com/Ashx120/cutcell-mechanics#readme"
+Changelog = "https://github.com/Ashx120/cutcell-mechanics/blob/main/CHANGELOG.md"
 
 [tool.setuptools.packages.find]
 where = ["src"]

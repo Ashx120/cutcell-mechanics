@@ -5,8 +5,8 @@ title: "CutCell Mechanics"
 authors:
   - family-names: Gupta
     given-names: Shrey
-repository-code: "https://github.com/Ashx120/immersed-elasticity"
-url: "https://github.com/Ashx120/immersed-elasticity"
+repository-code: "https://github.com/Ashx120/cutcell-mechanics"
+url: "https://github.com/Ashx120/cutcell-mechanics"
 license: MIT
 abstract: >-
   A research portfolio implementation of Q4 immersed plane-stress elasticity

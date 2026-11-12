@@ -33,6 +33,13 @@ verification; nonlinear plate comparisons; and fictitious-stiffness sensitivity.
 History counts are recorded, while actual memory bytes remain unmeasured.
 See [V3 results and reproduction commands](V3_RESULTS.md).
 
+The v3 plate workflow also supports validated JSON inputs, explicit command-line
+overrides, complete saved settings, progress reporting, and overwrite protection.
+The root `playground.py` groups the editable v3 settings and runs the shared
+analysis. The old elastic playground is at `scripts/elastic_playground.py`.
+The README is the usage entry point. Detailed v1/v2 data is retained in
+[the linear verification report](LINEAR_RESULTS.md).
+
 ## Further research features
 
 1. High-order integrated-Legendre basis with p-convergence verification.

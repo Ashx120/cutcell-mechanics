@@ -1,16 +1,27 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77.0.3"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "immersed-elasticity"
-version = "0.1.0"
-description = "Verified Q4 immersed plane-stress analysis of a plate with a circular hole"
+version = "0.3.0"
+description = "CutCell Mechanics: verified immersed elasticity, viscoplasticity, and moment-fitted quadrature"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{name = "Shrey Gupta"}]
+keywords = ["finite-elements", "computational-mechanics", "viscoplasticity", "quadrature", "moment-fitting"]
 requires-python = ">=3.11"
 dependencies = ["numpy>=1.26", "scipy>=1.11", "matplotlib>=3.8"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]
+
+[project.urls]
+Repository = "https://github.com/Ashx120/immersed-elasticity"
+Issues = "https://github.com/Ashx120/immersed-elasticity/issues"
+Documentation = "https://github.com/Ashx120/immersed-elasticity#readme"
+Changelog = "https://github.com/Ashx120/immersed-elasticity/blob/main/CHANGELOG.md"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -3,11 +3,16 @@
 import argparse
 import json
 from pathlib import Path
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+
+from immersed_elasticity.plate_settings import settings_from_metrics
 
 
 def main():
@@ -16,13 +21,19 @@ def main():
     parser.add_argument("--fitted", type=Path, default=Path("results/walkthrough/v3-fitted"))
     parser.add_argument("--output", type=Path, default=Path("results/walkthrough/v3-comparison"))
     args = parser.parse_args()
-    reference_metrics = json.loads((args.reference / "metrics.json").read_text())
-    fitted_metrics = json.loads((args.fitted / "metrics.json").read_text())
+    try:
+        reference_metrics = json.loads((args.reference / "metrics.json").read_text())
+        fitted_metrics = json.loads((args.fitted / "metrics.json").read_text())
+    except (OSError, ValueError) as error:
+        parser.error(f"Cannot read run metrics: {error}. Run both analyses or select saved results/v3 folders.")
     if reference_metrics["method"] != "quadtree" or fitted_metrics["method"] != "moment-fitting":
         parser.error("Expected quadtree reference and moment-fitting comparison.")
-    for key in ("mesh_n", "depth", "steps_per_phase", "alpha", "thickness_mm",
-                "plate_side_mm", "hole_radius_mm", "peak_displacement_mm", "material"):
-        if reference_metrics[key] != fitted_metrics[key]:
+    reference_settings = settings_from_metrics(reference_metrics)
+    fitted_settings = settings_from_metrics(fitted_metrics)
+    for settings in (reference_settings, fitted_settings):
+        settings["quadrature"].pop("method")
+    for key in reference_settings:
+        if reference_settings[key] != fitted_settings[key]:
             parser.error(f"Run settings differ for {key}.")
 
     reference = np.genfromtxt(args.reference / "history.csv", delimiter=",", names=True)

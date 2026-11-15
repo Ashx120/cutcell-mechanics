@@ -32,8 +32,8 @@ from the tracked files and must be configured on GitHub.
 
 ## Creating a versioned release
 
-The v3 source baseline is recorded as version `0.3.0` in the package, changelog,
-and citation metadata. For later milestones, move changelog entries from
+The v4 source milestone is version `0.4.0`; v3 is preserved at `v0.3.0`.
+Package, changelog, and citation versions must agree. For later milestones, move changelog entries from
 Unreleased to a dated heading and update the version and citation metadata before
 tagging the reviewed commit. A GitHub release page is a separate publishing step.
 Retain earlier tags, including the original `v1.0.0` milestone.

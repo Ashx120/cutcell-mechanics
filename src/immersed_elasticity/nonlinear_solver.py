@@ -12,6 +12,8 @@ from .quadrature import classify, cut_rule
 from .moment_fitting import compress_rule
 from .solver import Material, dofs, element_kinematics
 from .viscoplasticity import MaterialState
+from .thermal_expansion import update_thermal_plane_stress
+from .temperature_properties import with_temperature_dependent_elasticity, with_temperature_dependent_hardening
 
 
 @dataclass(frozen=True)
@@ -30,14 +32,27 @@ class IncrementResult:
 
 
 class NonlinearModel:
-    def __init__(self, mesh, material, thickness=1.0, *, depth=3, alpha=1e-6, method="quadtree"):
+    def __init__(self, mesh, material, thickness=1.0, *, depth=3, alpha=1e-6, method="quadtree",
+                 elasticity="constant", hardening="constant"):
         if not np.isfinite(thickness) or thickness <= 0:
             raise ValueError("Require positive finite thickness.")
         if not 0 < alpha <= 1 or depth < 0 or int(depth) != depth:
             raise ValueError("Require 0 < alpha <= 1 and nonnegative integer depth.")
         if method not in ("quadtree", "moment-fitting"):
             raise ValueError("Choose 'quadtree' or 'moment-fitting'.")
+        if elasticity not in ("constant", "paper-reference", "paper-temperature"):
+            raise ValueError("Choose constant, paper-reference, or paper-temperature elasticity.")
+        self.elasticity = elasticity
+        if hardening not in ("constant", "paper-reference", "paper-temperature"):
+            raise ValueError("Choose constant, paper-reference, or paper-temperature hardening.")
+        self.hardening = hardening
+        if elasticity != "constant":
+            material = with_temperature_dependent_elasticity(material, 20.)
+        if hardening != "constant":
+            material = with_temperature_dependent_hardening(material, 20.)
         self.material = material
+        self.mesh = mesh
+        self.temperature_interpolation = []
         self.elastic_matrix = Material(material.young, material.poisson).D
         self.ndofs = 2 * len(mesh.nodes)
         self.elements = []
@@ -61,7 +76,8 @@ class NonlinearModel:
                 except RuntimeError:
                     self.fallback_cells += 1
             point_locations.append(points)
-            _, matrices = element_kinematics(xy, points)
+            shape, matrices = element_kinematics(xy, points)
+            self.temperature_interpolation.append((cell, shape))
             self.elements.append((dofs(cell), matrices, weights * thickness))
         self.point_count = sum(len(weights) for _, _, weights in self.elements)
         self.points = np.concatenate(point_locations)
@@ -72,7 +88,17 @@ class NonlinearModel:
     def initial_state(self):
         return IncrementState(np.zeros(self.ndofs), tuple(MaterialState() for _ in range(self.point_count)))
 
-    def evaluate(self, displacement, committed_history, dt):
+    def evaluate(self, displacement, committed_history, dt, *, nodal_temperature=None,
+                 reference_temperature=20., expansion_coefficient=12e-6):
+        point_temperature = None
+        if (self.elasticity == "paper-temperature" or self.hardening == "paper-temperature") and nodal_temperature is None:
+            raise ValueError("Temperature-dependent elasticity or hardening requires nodal temperatures.")
+        if nodal_temperature is not None:
+            temperature = np.asarray(nodal_temperature, dtype=float)
+            if temperature.shape != (len(self.mesh.nodes),) or not np.all(np.isfinite(temperature)):
+                raise ValueError("Require one finite temperature per mesh node.")
+            point_temperature = np.concatenate([shape @ temperature[cell]
+                                               for cell, shape in self.temperature_interpolation])
         self.evaluations += 1
         internal = np.zeros(self.ndofs)
         rows, columns, values = [], [], []
@@ -85,7 +111,17 @@ class NonlinearModel:
                 strain = matrix @ displacement[ids]
                 if self.physical[point]:
                     self.plane_stress_updates += 1
-                    response = update_plane_stress(strain, committed_history[point], self.material, dt)
+                    if point_temperature is None:
+                        response = update_plane_stress(strain, committed_history[point], self.material, dt)
+                    else:
+                        material = (with_temperature_dependent_elasticity(self.material, point_temperature[point])
+                                    if self.elasticity == "paper-temperature" else self.material)
+                        if self.hardening == "paper-temperature":
+                            material = with_temperature_dependent_hardening(material, point_temperature[point])
+                        response = update_thermal_plane_stress(
+                            strain, committed_history[point], material, dt,
+                            temperature=point_temperature[point], reference_temperature=reference_temperature,
+                            expansion_coefficient=expansion_coefficient)
                     stress, tangent, trial_state = response.stress, response.tangent, response.state
                 else:
                     # The void supplies alpha-scaled linear elastic stiffness.
@@ -106,11 +142,15 @@ class NonlinearModel:
         return internal, tangent, tuple(trial_history), np.asarray(stresses)
 
 
-def solve_increment(model, previous, constraints, dt, force=None, *, max_iterations=25):
+def solve_increment(model, previous, constraints, dt, force=None, *, max_iterations=25,
+                    nodal_temperature=None, reference_temperature=20., expansion_coefficient=12e-6):
     """Solve one time increment without modifying the previous converged state.
 
     On failure, raise and leave history uncommitted. The caller advances by
     assigning result.state only after this function returns successfully.
+    Optional nodal temperatures stay fixed throughout Newton iterations. Thermal
+    strain enters the physical-point update; optional elastic fits are evaluated
+    at that fixed local temperature, so no temperature derivative enters Newton.
     """
     if not np.isfinite(dt) or dt <= 0:
         raise ValueError("Require dt > 0.")
@@ -129,7 +169,12 @@ def solve_increment(model, previous, constraints, dt, force=None, *, max_iterati
     displacement = previous.displacement.copy()
     displacement[fixed] = prescribed
     for iteration in range(max_iterations + 1):
-        internal, tangent, trial_history, stress = model.evaluate(displacement, previous.history, dt)
+        if nodal_temperature is None:
+            internal, tangent, trial_history, stress = model.evaluate(displacement, previous.history, dt)
+        else:
+            internal, tangent, trial_history, stress = model.evaluate(
+                displacement, previous.history, dt, nodal_temperature=nodal_temperature,
+                reference_temperature=reference_temperature, expansion_coefficient=expansion_coefficient)
         residual = internal - external
         residual_norm = float(np.linalg.norm(residual[free]))
         tolerance = 1e-8 + 1e-9 * max(np.linalg.norm(internal), np.linalg.norm(external))

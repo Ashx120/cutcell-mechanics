@@ -1,0 +1,40 @@
+{
+  "geometry": {
+    "length": 4.0,
+    "height": 4.0,
+    "radius": 1.0,
+    "nx": 16,
+    "ny": 16
+  },
+  "material": {
+    "young": 210000.0,
+    "poisson": 0.3,
+    "initial_yield": 250.0,
+    "saturation_increment": 100.0,
+    "hardening_rate": 20.0,
+    "relaxation_time": 100.0,
+    "rate_exponent": 1.0
+  },
+  "elasticity": "paper-temperature",
+  "hardening": "paper-temperature",
+  "reference_elastic_material": {
+    "young": 208264.23795447155,
+    "poisson": 0.2873055927763485,
+    "initial_yield": 250.0,
+    "saturation_increment": 206.3425,
+    "hardening_rate": 35.90717134435372,
+    "relaxation_time": 100.0,
+    "rate_exponent": 1.0
+  },
+  "conductivity_W_per_mm_K": 0.045,
+  "thickness_mm": 1.0,
+  "reference_temperature_C": 20.0,
+  "right_temperature_C": 320.0,
+  "expansion_coefficient_per_K": 1.2e-05,
+  "depth": 3,
+  "alpha": 1e-06,
+  "steps_per_second": 40,
+  "heating_time_s": 1.0,
+  "hold_time_s": 2.0,
+  "supports": "left ux=0; bottom uy=0"
+}

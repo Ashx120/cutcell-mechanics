@@ -1,285 +1,119 @@
 # CutCell Mechanics
 
-**Verified immersed finite-element analysis with moment-fitted quadrature.**
+**Explore how heating deforms a plate with a hole—and how fewer integration points can give nearly the same answer.**
 
 [![Verification](https://github.com/Ashx120/cutcell-mechanics/actions/workflows/tests.yml/badge.svg)](https://github.com/Ashx120/cutcell-mechanics/actions/workflows/tests.yml)
 [![Python](https://img.shields.io/badge/Python-3.11%2B-blue)](pyproject.toml)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
-[Quick start](#install-and-check) · [Editable settings](#edit-inputs-in-one-place) ·
-[Results](docs/V3_RESULTS.md) · [Contributing](CONTRIBUTING.md) · [Changelog](CHANGELOG.md)
+[Start here](docs/GETTING_STARTED.md) · [Results](docs/RESULTS.md) · [Model and limits](docs/MODEL.md) · [Technical guide](docs/DEVELOPMENT.md)
 
-A Python research portfolio project for small-strain plane-stress analysis on a
-Cartesian Q4 mesh with a circular hole. It combines verified elastic and J2
-Perzyna viscoplastic solvers with quadtree and non-negative moment-fitted quadrature.
+CutCell Mechanics is a Python computational-mechanics portfolio project. It
+simulates a thin plate that expands as one side is heated. Supports resist part
+of that expansion, creating stress; time-dependent plastic deformation can then
+relax that stress while temperatures stay fixed.
+
+The numerical question is whether **non-negative moment fitting** can reduce
+the number of integration points where material behaviour is evaluated while
+retaining close agreement with a quadtree reference. You can run and modify the
+example without first learning the finite element method (FEM).
 
 **This is an AI-assisted computational mechanics project.**
 
-**V3 result on the tested plate:** moment fitting used **17% fewer physical history
-points** and **18% fewer plane-stress updates**. The largest reaction-history
-difference was **0.0031% of the quadtree peak force**. Saved individual runs showed
-roughly **19–21% shorter solve time**. These observations belong to this experiment.
+![Final temperature, stress, and plastic strain in the recorded 16 x 16 example](docs/images/reference/fields.png)
 
-![Reaction comparison](results/v3/comparison/reaction_comparison.png)
+These are project-generated physical integration-point samples from the finer
+recorded example. The starter run is coarser. Colour scales differ by field;
+the local stress/strain peaks have not been established as mesh converged.
 
-## Install and check
+## Run your first example
 
-Use Python **3.11+**, Git, and a terminal. Recorded runs use Python 3.12 on Windows.
-Run these PowerShell commands once:
+Use Python **3.11+** and Git. In Windows PowerShell:
 
 ```powershell
 git clone https://github.com/Ashx120/cutcell-mechanics.git
 cd cutcell-mechanics
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -e ".[dev]"
+.\.venv\Scripts\python.exe run.py
+```
+
+On Linux/macOS replace `.\.venv\Scripts\python.exe` with `.venv/bin/python`.
+Existing users can rerun the install command after updating.
+
+The coarse starter took about **12 seconds** on the development machine;
+runtime varies. Progress appears in the terminal, followed by the output path.
+Each run gets a new folder under `results/runs/`, preserving earlier results.
+
+Open **summary.txt**, **history.png**, and **fields.png** in that folder. The
+[first-run guide](docs/GETTING_STARTED.md) explains what the plots mean and how
+to recognise the difference between numerical agreement and physical accuracy.
+
+## Change the experiment
+
+Edit **[config.py](config.py)**, save, and run the same command again.
+
+| Settings | What you control |
+|---|---|
+| `GEOMETRY` | Plate dimensions, hole radius, and mesh resolution |
+| `MATERIAL`, `PROPERTIES` | Elastic/plastic parameters and selected temperature-dependent fits |
+| `LOADING` | Reference/reservoir temperatures, heating duration, hold, and time steps |
+| `SUPPORTS` | Restrained edges or only whole-body motion prevention |
+| `QUADRATURE` | Quadtree or moment fitting, integration depth, fictitious factor |
+| `THICKNESS`, `CONDUCTIVITY`, `EXPANSION_COEFFICIENT` | Thickness and thermal parameters |
+| `OUTPUT_ROOT` | Parent folder for new runs |
+
+All units and options are explained in the file. Geometry is in mm, stress in
+MPa, time in seconds, and temperature in degrees C. Boundary layouts are the two
+documented choices, not an arbitrary boundary-condition editor. Paper property
+modes override the corresponding elastic/hardening constants, as documented.
+
+## What the recorded comparison shows
+
+In the matched **16 x 16 restrained thermal example**, moment fitting uses:
+
+- **33.5% fewer total mechanical integration points:** 1628 -> 1082.
+- **17.0% fewer physical history points:** 1227 -> 1019.
+- A largest mean-right-displacement history difference of **2.15e-9 mm**.
+
+The nodal temperature fields are identical in this comparison. These observations
+belong to this input set; they do not establish local-field convergence or a
+general performance guarantee. [Saved data and reproduction commands](docs/RESULTS.md)
+are included, so you can inspect the evidence without another nonlinear solve.
+
+## Scope
+
+This is a **paper-inspired implementation of selected methods**, not a full
+replication. It uses 2D small-strain plane stress, immersed Q4 elements, Perzyna
+viscoplasticity, stationary one-way thermal coupling, and selected elastic and
+hardening fits. The initial yield and viscosity remain fixed.
+
+Higher-order adaptive overlays, the paper's matched 3D examples, and missing
+temperature-property laws are outside this release. No transient conduction or
+plastic heating is implemented; the source paper also neglects those effects.
+Supports strongly affect the demonstrated plastic hotspot. Read
+[the model and limitations](docs/MODEL.md) before interpreting engineering results.
+
+Inspired by Schmäke, Wege, and Ruess, *Efficient Thermo-Viscoplastic Analysis Using
+a Multi-Level hp-Finite Cell Method with Non-Negative Moment Fitting*,
+[arXiv:2604.15921v2](https://arxiv.org/abs/2604.15921v2).
+
+## Verification and project guide
+
+```powershell
 .\.venv\Scripts\python.exe -m pytest -q
 ```
 
-The suite contains **89 tests** on the v4 development branch. Activation is optional because these commands
-use the environment's Python explicitly. On Linux/macOS, substitute
-`.venv/bin/python` for `.\.venv\Scripts\python.exe`. For recorded dependency
-versions, install `requirements-lock.txt` before installing the package with
-`--no-deps`. Existing users can keep their environment and rerun the editable
-installation after updating package metadata. Run commands from the project root.
+The checks cover analytical elastic/thermal limits, material tangents, history
+management, equilibrium, quadrature, and the user workflow. GitHub CI tests
+Windows/Linux on Python 3.11/3.12 and builds/imports the package wheel.
 
-## V4 development: thermomechanics
+Reusable numerical code is under `src/immersed_elasticity/`, experiment runners
+under `scripts/`, checks under `tests/`, and explanations under `docs/`. Older
+playgrounds remain compatible examples. [The technical guide](docs/DEVELOPMENT.md)
+maps the files and preserved milestones; new users can start with run.py alone.
 
-The v4 source milestone is version `0.4.0` (tag `v0.4.0`). It adds stationary conduction,
-thermal expansion, thermal viscoplastic histories, and optional temperature-dependent
-elasticity and hardening. Its development branch is `v4-thermomechanics`;
-v3 remains preserved at `v0.3.0` and on `v3-viscoplasticity`.
-
-Edit [thermal_playground.py](thermal_playground.py) for all v4 thermal inputs, then run:
-
-```powershell
-.\.venv\Scripts\python.exe thermal_playground.py
-```
-
-The default runs the verified 16 x 16 restrained-heating example with temperature-
-dependent elasticity/hardening, moment-fitted mechanics, and 0.025 s increments.
-Expect about one to two minutes, depending on hardware. Settings, metrics, CSV
-data, and plots are saved to `results/playground/v4/`. Change `OUTPUT_DIR` to keep
-earlier runs or explicitly set `OVERWRITE_OUTPUT=True` to replace them.
-
-Follow the [v4 walkthrough](docs/V4_WALKTHROUGH.md) for small verification cases
-and matched plate commands. Read [v4 results and limitations](docs/V4_RESULTS.md)
-for sensitivity studies, the support-driven hotspot, and the quadrature comparison.
-The [material-property notes](docs/V4_MATERIAL_PROPERTIES.md) give fit provenance
-and explain which parameters remain fixed.
-
-The thermal example is **one-way coupling through prescribed equilibrium temperature
-snapshots**, with an approximately insulated hole. Initial-yield softening,
-transient conduction, and plastic heating are not implemented. The original
-`playground.py` continues to run v3; `thermal_playground.py` runs v4.
-
-## Run v3
-
-### Start with a small plate
-
-```powershell
-.\.venv\Scripts\python.exe playground.py
-```
-
-The example uses a 6 x 6 mesh, depth-two quadrature, and ten increments per phase.
-Right-edge displacement increases to 0.012 mm over one second, then stays fixed
-for one second. This coarse run supports learning and quick checks. Progress
-messages report step, time, reaction, and sampled maximum strain. Finer runs can
-take several minutes.
-
-### Edit inputs in one place
-
-Edit the settings block at the top of [playground.py](playground.py), save, and
-rerun that same command. This is the primary v3 interface. It builds the model,
-solves the full history, and saves plots and data using the shared solver.
-
-| Settings | Meaning and units |
-|---|---|
-| `GEOMETRY` | `nx`, `ny`, dimensions, and origin-centred hole `radius` in mm |
-| `MATERIAL` | Elastic, yield, hardening, and Perzyna parameters; stress in MPa and relaxation time in seconds |
-| `THICKNESS` | Thickness in mm |
-| `LOADING` | Peak displacement in mm, loading/hold durations in seconds, and increments per phase |
-| `QUADRATURE` | `method`, subdivision `depth`, and fictitious stiffness `alpha` |
-| `OUTPUT_DIR` | Folder for this run's data and plots |
-| `OVERWRITE_OUTPUT` | Set `True` to replace an earlier run in that folder |
-
-Set `radius=0` for a solid rectangle. A positive radius must be smaller than both
-dimensions. The hole is centred at the origin in this quarter model. Left-edge
-ux and bottom-edge uy are fixed by symmetry. Right-edge ux follows the loading
-schedule while uy is free. The top and hole boundaries carry zero prescribed
-traction. This boundary layout is fixed in the example. General nodal constraints
-can be supplied through the Python `solve_increment` interface.
-
-Default outputs go to `results/playground/v3/`. To keep earlier results, change
-`OUTPUT_DIR` before another run. The original elastic playground is preserved
-at `scripts/elastic_playground.py`. The material-point demonstration has its
-own shear-loading settings in `scripts/material_point.py`.
-
-For reproducible command-line experiments, `scripts/nonlinear_plate.py` also
-accepts [a JSON input](examples/nonlinear_plate.json) through `--config`. Those
-advanced commands are shown below. Editing `playground.py` is sufficient for
-normal interactive use.
-
-### Reproduce the finer comparison
-
-These commands keep geometry, material, mesh, and loading matched:
-
-```powershell
-.\.venv\Scripts\python.exe scripts/nonlinear_plate.py --config examples/nonlinear_plate.json --mesh 16 --depth 3 --steps 40 --method quadtree --output results/walkthrough/v3-quadtree
-.\.venv\Scripts\python.exe scripts/nonlinear_plate.py --config examples/nonlinear_plate.json --mesh 16 --depth 3 --steps 40 --method moment-fitting --output results/walkthrough/v3-fitted
-.\.venv\Scripts\python.exe scripts/compare_nonlinear_histories.py
-```
-
-`--mesh` overrides both nx and ny. `--steps` overrides increments per phase.
-`--alpha` overrides fictitious stiffness. Use `--help` for the full interface.
-Reusing a nonempty analysis folder requires `--overwrite`; a new output folder
-keeps previous runs available. Commands without `--config` retain their original
-default model.
-
-### Read the outputs
-
-| File | Contents |
-|---|---|
-| `settings.json` | Resolved inputs including overrides; reusable with `--config` |
-| `metrics.json` | Parameters, point counts, update counts, and timing metadata |
-| `history.csv` | Time, displacement, reaction, maximum strain, iterations, residuals |
-| `response.png` | Reaction versus time and imposed displacement |
-| `plastic_strain.csv` | Final physical-point coordinates and accumulated strain |
-| `plastic_strain.png` | Unsmoothed strain samples at the integration points |
-
-The comparison checks matched inputs and time samples, then saves an overlay,
-signed force differences, and summary metrics. It accepts original v3 snapshots
-and newly configured runs. Inspect published data without rerunning:
-
-```powershell
-.\.venv\Scripts\python.exe scripts/compare_nonlinear_histories.py --reference results/v3/quadtree --fitted results/v3/fitted --output results/walkthrough/saved-comparison
-```
-
-`results/v3/` contains published snapshots. `results/walkthrough/` and
-`results/playground/` are ignored local experiments. Top-level `results/` files
-preserve the original elastic benchmark.
-
-## Follow the verification checkpoints
-
-Run each script using the environment's Python executable.
-
-| Script | Purpose |
-|---|---|
-| `scripts/material_point.py` | Shear loading, relaxation, and unloading |
-| `scripts/material_point.py --dt 0.005 --output results/walkthrough/point-finer` | Time-step sensitivity |
-| `scripts/material_point.py --dt 0.0025 --loading-time 0.5 --output results/walkthrough/point-fast` | Faster loading to the same peak strain |
-| `scripts/check_material_tangent.py` | 3D tangent against numerical differentiation |
-| `scripts/check_plane_stress.py` | Zero thickness stress and in-plane tangent |
-| `scripts/nonlinear_rectangle.py` | Uniform FEM response against a material point |
-| `scripts/nonlinear_plate.py` | Spatially varying yielding and reaction relaxation |
-| `scripts/compare_nonlinear_histories.py` | Quadrature agreement over the history |
-
-[V3_RESULTS.md](docs/V3_RESULTS.md) contains equations, sensitivity tables,
-recorded timing context, and remaining limits. Its saved verification data still
-applies after these input/workflow improvements.
-
-## Earlier elastic and quadrature experiments
-
-V1 established the elastic solver and Kirsch verification. V2 added moment
-fitting and cached-integration experiments. Both remain runnable:
-
-```powershell
-.\.venv\Scripts\python.exe scripts/elastic_playground.py
-.\.venv\Scripts\python.exe scripts/run_benchmark.py --output results/walkthrough/elastic
-.\.venv\Scripts\python.exe scripts/fit_one_cell.py --degree 2
-.\.venv\Scripts\python.exe scripts/compare_quadrature.py
-.\.venv\Scripts\python.exe scripts/time_quadrature.py
-```
-
-Edit `scripts/elastic_playground.py` for custom linear-elastic geometry, material, and edge
-conditions. [LINEAR_RESULTS.md](docs/LINEAR_RESULTS.md) preserves the formulation,
-reference model, convergence tables, and v2 timings.
-
-## Calculation flow
-
-```mermaid
-flowchart TD
-    A[Load and validate inputs] --> B[Build mesh and fixed quadrature]
-    B --> C[Initialize displacement and point histories]
-    C --> D[Advance prescribed loading to the next time]
-    D --> E[Update material from previous committed history]
-    E --> F[Assemble internal forces and tangent stiffness]
-    F --> G{Equilibrium satisfied?}
-    G -->|No| H[Correct free displacements]
-    H --> E
-    G -->|Yes| I[Commit converged trial histories]
-    I --> J{More increments?}
-    J -->|Yes| D
-    J -->|No| K[Save settings, histories, plots, and diagnostics]
-```
-
-Physical points evolve viscoplastically. Fictitious points inside the hole supply
-weak elastic stiffness. Fitting compresses each region separately before loading;
-point identities stay fixed throughout a run.
-
-## File guide
-
-| Location | Responsibility |
-|---|---|
-| `playground.py` | Primary v3 entry point and editable settings |
-| `examples/nonlinear_plate.json` | Optional inputs for command-line experiments |
-| `scripts/elastic_playground.py` | Original v1/v2 elastic playground |
-| `scripts/` | Analyses, comparisons, and verification demonstrations |
-| `src/immersed_elasticity/plate_settings.py` | Input defaults, validation, saved-run compatibility |
-| `nonlinear_solver.py` in the source package | Incremental equilibrium and history |
-| `viscoplasticity.py`, `plane_stress.py` | Material update, tangent, plane stress |
-| `solver.py`, `quadrature.py`, `moment_fitting.py` | Q4 mechanics and integration |
-| `reference.py`, `benchmark.py` | Kirsch solution and elastic verification |
-| `tests/` | Physical, numerical, and script-workflow checks |
-| `docs/` | Detailed reports and roadmap |
-| `results/v3/` | Recorded nonlinear data and figures |
-
-## Troubleshooting
-
-- If imports fail, use the environment's Python and rerun `pip install -e ".[dev]"`.
-- For a nonempty output folder, choose a new folder or explicitly use `--overwrite`.
-- For configuration errors, check the reported field and units. Unknown keys are
-  rejected to catch misspellings.
-- A comparison requires matching geometry, material, loading, time steps, alpha,
-  and reference depth.
-- If Newton fails, history stays uncommitted. Try smaller increments or a less
-  demanding loading history. The solver raises an exception on failed convergence.
-
-## Scope and limitations
-
-Inspired by Schmäke, Wege, and Ruess, *Efficient Thermo-Viscoplastic Analysis Using
-a Multi-Level hp-Finite Cell Method with Non-Negative Moment Fitting*.
-[Source paper](https://arxiv.org/abs/2604.15921v2)
-
-This project independently implements selected immersed-discretization,
-integration, and isothermal material ideas. Parameters are illustrative. Thermal
-coupling, high-order bases, and hierarchical adaptive overlays remain extensions.
-The paper's Section 5.1 uses a different Perić flow rule.
-
-The nonlinear solver uses fixed increments and plain Newton iterations, with no
-line search or automatic time-step reduction. Changing meshes or quadrature
-requires a fresh history. Local strain maxima remain incompletely converged.
-Runtime observations are individual runs, and history counts represent point
-counts rather than measured memory bytes. Nonlinear quadrature agreement is
-specific to the tested load path and resolution.
-
-See [the v3 report](docs/V3_RESULTS.md) and
-[development roadmap](docs/V2_ROADMAP.md) for further verification work.
-
-## License
-
-Code and documentation use the [MIT License](LICENSE). Dependencies and the
-referenced paper retain their respective licenses.
-
-## Contributing and citing
-
-For bugs, include the input settings, exact command, output, environment, and
-commit used. Numerical feature proposals should include a verification strategy.
-See [CONTRIBUTING.md](CONTRIBUTING.md) and the
-[issue templates](https://github.com/Ashx120/cutcell-mechanics/issues/new/choose).
-
-[CITATION.cff](CITATION.cff) provides software attribution. Cite the specific Git
-commit for reproducible use, and cite the source paper separately when discussing
-its method. The [changelog](CHANGELOG.md) tracks development milestones.
-
-The [publishing checklist](docs/PUBLISHING.md) covers the remaining GitHub release
-steps and distinguishes local checks from CI checks on the remote repository.
+Code and documentation use the [MIT License](LICENSE). The referenced paper
+and dependencies retain their own licences. See [CONTRIBUTING.md](CONTRIBUTING.md),
+[CITATION.cff](CITATION.cff), and [the changelog](CHANGELOG.md). Cite the specific
+software commit and the source paper separately when discussing its method.

@@ -1,13 +1,13 @@
 # Repository publishing checklist
 
-The source tree follows a scientific Python layout. The root README and
-playground are the user entry points, reusable code lives under `src/`, tests
-under `tests/`, and detailed scientific evidence under `docs/` and `results/v3/`.
+The source tree follows a scientific Python layout. Start with run.py and
+config.py. Reusable code lives under src/, tests under tests/, and evidence
+under docs/, results/reference/thermal/, and results/v3/.
 
 ## Before merging a development milestone
 
 1. Install the current package and run `python -m pytest -q` and `python -m pip check`.
-2. Check that the editable playground and published-data comparison work.
+2. Check that run.py, config.py, saved-input replay, and the published-data comparison work.
 3. Review the diff and confirm that local environments, caches, the source-paper
    PDF, and temporary outputs are excluded. Preserve published reference snapshots.
 4. Update the changelog and verify that performance claims include their measured
@@ -22,7 +22,7 @@ under `tests/`, and detailed scientific evidence under `docs/` and `results/v3/`
 
 In GitHub's About panel, a suitable description is:
 
-> Verified Q4 immersed elasticity and J2 viscoplasticity with non-negative moment-fitting quadrature.
+> Explore thermal expansion, viscoplastic stress relaxation, and efficient immersed FEM integration in Python.
 
 Relevant topics include `finite-element-method`, `computational-mechanics`,
 `numerical-analysis`, `viscoplasticity`, `quadrature`, and `python`.
@@ -32,7 +32,8 @@ from the tracked files and must be configured on GitHub.
 
 ## Creating a versioned release
 
-The v4 source milestone is version `0.4.0`; v3 is preserved at `v0.3.0`.
+The presentation release is version `1.1.0`; v4/v3 are preserved at `v0.4.0`
+and `v0.3.0`. The original elastic `v1.0.0` tag is retained, not overwritten.
 Package, changelog, and citation versions must agree. For later milestones, move changelog entries from
 Unreleased to a dated heading and update the version and citation metadata before
 tagging the reviewed commit. A GitHub release page is a separate publishing step.

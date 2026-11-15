@@ -9,16 +9,15 @@ from time import perf_counter
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 import numpy as np
 
 from immersed_elasticity.nonlinear_solver import NonlinearModel, solve_increment
-from immersed_elasticity.solver import structured_mesh, symmetry_constraints
+from immersed_elasticity.solver import structured_mesh
+from immersed_elasticity.boundary_conditions import thermal_constraints
 from immersed_elasticity.thermal import solve_stationary_heat
 from immersed_elasticity.viscoplasticity import J2Material
 from immersed_elasticity.thermal_settings import thermal_settings
+from immersed_elasticity.thermal_plots import save_thermal_plots
 
 def main(argv=None, *, initial_settings=None, output=None, overwrite=False):
     parser = argparse.ArgumentParser(description=__doc__)
@@ -70,11 +69,7 @@ def main(argv=None, *, initial_settings=None, output=None, overwrite=False):
                                 depth=args.depth, alpha=args.alpha)
     model = NonlinearModel(mesh, material, thickness, depth=args.depth, alpha=args.alpha,
                            elasticity=args.elasticity, hardening=args.hardening, method=args.method)
-    constraints = symmetry_constraints(mesh)
-    if args.supports == "minimal":
-        first = int(np.flatnonzero(np.isclose(x, 0.) & np.isclose(y, mesh.height))[0])
-        second = int(np.flatnonzero(np.isclose(x, mesh.length) & np.isclose(y, mesh.height))[0])
-        constraints = {2*first: 0., 2*first+1: 0., 2*second+1: 0.}
+    constraints = thermal_constraints(mesh, args.supports)
     state = model.initial_state()
     history = [[0., reference_temperature, 0., 0., 0., 0., 0]]
     heating_steps = int(np.ceil(heating_time*args.steps_per_second))
@@ -90,6 +85,7 @@ def main(argv=None, *, initial_settings=None, output=None, overwrite=False):
     print(f"Left edge ramps from {reference_temperature:g} to {loading['left_temperature']:g} C; supports: {args.supports}.", flush=True)
     print(f"Elasticity: {args.elasticity}; hardening: {args.hardening}; initial yield, viscosity, and expansion coefficient fixed.", flush=True)
     start = perf_counter()
+    progress_interval = max(1, (len(times)-1)//10)
     for step in range(1, len(times)):
         time, dt = times[step], times[step]-times[step-1]
         scale = min(time/heating_time, 1.)
@@ -111,6 +107,8 @@ def main(argv=None, *, initial_settings=None, output=None, overwrite=False):
         if step in (heating_steps, len(times)-1):
             print(f"t={time:g} s: mean right ux={ux:.9f} mm; max von Mises={von_mises.max():.6f} MPa; "
                   f"max accumulated strain={plastic.max():.8f}", flush=True)
+        elif step % progress_interval == 0:
+            print(f"Progress: {step}/{len(times)-1} increments; t={time:g} s", flush=True)
     print(f"Maximum free residual: {maximum_residual:.3e} N; force imbalance: {maximum_imbalance:.3e} N")
     solve_seconds = perf_counter()-start
     print(f"Maximum Newton corrections: {maximum_iterations}; solve time: {solve_seconds:.3f} s")
@@ -144,25 +142,33 @@ def main(argv=None, *, initial_settings=None, output=None, overwrite=False):
                delimiter=",", comments="", header="x_mm,y_mm,temperature_C,ux_mm,uy_mm")
     np.savetxt(args.output / "physical_samples.csv", np.column_stack((model.points[model.physical], stress, von_mises, plastic, point_temperature)),
                delimiter=",", comments="", header="x_mm,y_mm,sigma_xx_MPa,sigma_yy_MPa,tau_xy_MPa,von_mises_MPa,accumulated_strain,temperature_C")
-    fig, axes = plt.subplots(1, 2, figsize=(11, 4), layout="constrained")
-    for ax, column, label in zip(axes, (3, 4), ("Sampled peak von Mises [MPa]", "Maximum accumulated strain")):
-        ax.plot(history[:, 0], history[:, column])
-        if hold_time:
-            ax.axvspan(heating_time, heating_time+hold_time, alpha=.12, color="gray")
-        ax.set(xlabel="Time [s]", ylabel=label)
-        ax.grid(alpha=.2)
-    fig.savefig(args.output / "history.png", dpi=160)
-    plt.close(fig)
-    fig, ax = plt.subplots(figsize=(6, 5), layout="constrained")
-    field = ax.scatter(*model.points[model.physical].T, c=plastic, s=10, cmap="viridis")
-    angle = np.linspace(0, np.pi/2, 100)
-    ax.plot(mesh.radius*np.cos(angle), mesh.radius*np.sin(angle), color="black")
-    ax.set(xlim=(0, mesh.length), ylim=(0, mesh.height), aspect="equal", xlabel="x [mm]", ylabel="y [mm]",
-           title="Accumulated viscoplastic strain after the hold")
-    fig.colorbar(field, ax=ax)
-    fig.savefig(args.output / "plastic_strain.png", dpi=160)
-    plt.close(fig)
-    print(f"Saved history, nodal/physical samples, and plots to {args.output}")
+    save_thermal_plots(args.output, history, model.points[model.physical], point_temperature,
+                       von_mises, plastic, mesh, loading)
+    summary = (
+        "CutCell Mechanics - run summary\n\n"
+        f"Mechanical supports: {args.supports}\n"
+        "symmetry = left x rollers and bottom y rollers; minimal = rigid motion removed only.\n"
+        f"Mesh: {geometry['nx']} x {geometry['ny']}; method: {args.method}\n"
+        f"Elasticity: {args.elasticity}; hardening: {args.hardening}\n"
+        f"Final mean right-edge x displacement: {ux:.9f} mm\n"
+        f"Final sampled peak von Mises stress: {von_mises.max():.6f} MPa\n"
+        f"Final maximum accumulated plastic strain: {plastic.max():.8g}\n"
+        f"Temperature at that plastic-strain sample: {point_temperature[peak]:.3f} C\n"
+        f"Maximum free equilibrium residual: {maximum_residual:.3e} N\n"
+        f"Solve time: {solve_seconds:.3f} s (single run, not a performance benchmark)\n\n"
+        "Open history.png to see the heating schedule and mechanical response.\n"
+        "The shaded interval is the temperature hold. Plastic strain records permanent\n"
+        "deformation history; zero means no plastic accumulation in this run.\n"
+        "Open fields.png to locate the final temperature, stress, and plastic strain.\n"
+        "Dots are physical integration points, not a finer displacement mesh.\n"
+        "Colour limits vary between fields/runs. Compare numerical values as well.\n\n"
+        "This is a coarse demonstration unless resolution has been verified separately.\n"
+        "The restrained-heating hotspot can be near the cold supported corner.\n"
+        "Low residual confirms equilibrium, not mesh convergence or physical validation.\n"
+        "Temperature snapshots are stationary; no transient heat or plastic heating.\n"
+        "See docs/GETTING_STARTED.md and docs/MODEL.md for interpretation and limits.\n")
+    (args.output / "summary.txt").write_text(summary, encoding="utf-8")
+    print(f"Saved results to {args.output.resolve()}\nOpen summary.txt, history.png, and fields.png first.")
 
 
 if __name__ == "__main__":

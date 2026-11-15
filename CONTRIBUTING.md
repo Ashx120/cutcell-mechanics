@@ -24,16 +24,17 @@ builds an installable wheel.
 
 ## Where changes belong
 
-- `playground.py` is the primary editable v3 interface. It calls the shared runner.
-- `thermal_playground.py` is the primary editable v4 thermal interface.
+- `run.py` is the public entry point; `config.py` holds the editable inputs.
+- `playground.py` and `thermal_playground.py` retain the v3/v4 development examples.
 - `src/immersed_elasticity/` contains reusable numerical and input-handling code.
 - `scripts/` contains thin runnable experiments and comparisons.
 - `examples/` contains optional command-line input configurations.
 - `tests/` contains independent physical checks and regression tests.
 - `docs/` contains detailed verification reports and the roadmap.
 - `results/v3/` contains selected published reference snapshots.
+- `results/reference/thermal/` contains the saved thermal comparison and provenance.
 
-Keep temporary runs in `results/walkthrough/` or `results/playground/`, which are
+Keep temporary runs in `results/runs/`, `results/walkthrough/`, or `results/playground/`, which are
 ignored by Git. Use a new output directory to preserve earlier runs.
 
 ## Numerical changes

@@ -1,9 +1,35 @@
 # Changelog
 
 User-facing changes are grouped by source release and development milestone.
-Versions 0.3.0 and 0.4.0 record the v3 and v4 source milestones.
+Versions 0.3.0 and 0.4.0 record the v3/v4 source milestones; 1.1.0 packages the
+verified numerical scope as the final portfolio presentation release.
 
 ## Unreleased
+
+## [1.1.0] - 2026-11-15
+
+### Added
+
+- Public run.py entry point and one editable config.py with a coarse starter case.
+- Automatic separate run folders and saved-configuration replay, including v4 snapshots.
+- Plain-language run summaries, progress messages, and loading/temperature/stress/strain plots.
+- Beginner getting-started guide, concise results page, model scope, and technical code map.
+- Selected thermal reference snapshots with provenance and a repeatable comparison command.
+- Workflow checks for safe reruns, replay, and mismatched comparison inputs.
+
+### Changed
+
+- README now introduces the engineering problem and first run before technical details.
+- Shared thermal support construction and plotting replace duplicate runner code.
+- The numerical scope remains the verified v4 subset; no new physics or adaptive method added.
+- Development playgrounds remain compatible. The original v1.0.0 tag is preserved;
+  v1.1.0 identifies the final portfolio presentation release.
+
+### Verification
+
+- 93 automated checks pass, including saved-input replay and published-reference comparison.
+- Coarse starter and finer v4 replay run successfully; the fine history matches the preserved baseline.
+- Editable installation, dependency checks, and isolated wheel imports pass.
 
 ## [0.4.0] - 2026-11-15
 

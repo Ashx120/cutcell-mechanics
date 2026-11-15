@@ -1,0 +1,11 @@
+{
+  "integration_points": 1082,
+  "physical_history_points": 1019,
+  "plane_stress_updates": 286339,
+  "global_evaluations": 281,
+  "maximum_newton_corrections": 3,
+  "solve_seconds": 86.38620379999884,
+  "maximum_free_residual_N": 9.517634634632323e-08,
+  "maximum_force_imbalance_N": 1.4377388168895777e-13,
+  "fallback_cells": 0
+}

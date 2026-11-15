@@ -11,7 +11,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-from immersed_elasticity.solver import Material, structured_mesh, symmetry_constraints
+from immersed_elasticity.solver import Material, structured_mesh
+from immersed_elasticity.boundary_conditions import thermal_constraints
 from immersed_elasticity.thermal import solve_stationary_heat
 from immersed_elasticity.thermoelastic import solve_thermoelastic
 
@@ -48,13 +49,7 @@ def main():
     prescribed.update({int(i): args.right_temperature for i in right})
     heat = solve_stationary_heat(mesh, CONDUCTIVITY, MATERIAL.thickness, prescribed,
                                 depth=args.depth, alpha=args.alpha)
-    constraints = symmetry_constraints(mesh)
-    if args.supports == "minimal":
-        anchor = int(np.flatnonzero(np.isclose(x, 0.) & np.isclose(y, mesh.height))[0])
-        second = int(np.flatnonzero(np.isclose(x, mesh.length) & np.isclose(y, mesh.height))[0])
-        # Two translations at top-left and one vertical DOF at top-right set
-        # only the rigid translation/rotation of a traction-free body.
-        constraints = {2*anchor: 0., 2*anchor+1: 0., 2*second+1: 0.}
+    constraints = thermal_constraints(mesh, args.supports)
     result = solve_thermoelastic(
         mesh, MATERIAL, heat.temperature, constraints, depth=args.depth, alpha=args.alpha,
         reference_temperature=REFERENCE_TEMPERATURE, expansion_coefficient=EXPANSION_COEFFICIENT)

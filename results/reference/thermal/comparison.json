@@ -1,0 +1,8 @@
+{
+  "max_mean_right_displacement_difference_mm": 2.1526908935975975e-09,
+  "final_nodal_displacement_difference_norm_mm": 1.7958730898443025e-06,
+  "final_relative_nodal_displacement_norm": 1.663814124092862e-05,
+  "max_sampled_peak_stress_history_difference_MPa": 0.00035019080519305135,
+  "max_sampled_peak_strain_history_difference": 1.1499793441723666e-09,
+  "note": "Sampled stress/strain maxima are not matched-point field error norms. Nodal displacement norm includes all active nodes."
+}

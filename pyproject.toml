@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "immersed-elasticity"
-version = "0.4.0"
+version = "1.1.0"
 description = "CutCell Mechanics: immersed thermo-viscoplasticity with verified moment-fitted quadrature"
 readme = "README.md"
 license = "MIT"

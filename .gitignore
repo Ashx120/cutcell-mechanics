@@ -8,5 +8,6 @@ dist/
 # Local experiments. Keep the reference benchmark files in results/.
 /results/playground/
 /results/walkthrough/
+/results/runs/
 # The source manuscript is referenced, not redistributed.
 2604.15921v2.pdf

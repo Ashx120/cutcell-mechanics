@@ -1,4 +1,8 @@
-# Development status and roadmap
+# Historical development roadmap
+
+This page records the v2/v3 development stage. Thermal coupling and selected
+temperature-dependent properties were subsequently implemented in v4. See
+[the current model scope](MODEL.md) and [results](RESULTS.md) for release status.
 
 V1 is an educational, bilinear immersed elasticity solver. It does not reproduce
 the complete high-order thermo-viscoplastic method in the source paper.
@@ -40,7 +44,7 @@ analysis. The old elastic playground is at `scripts/elastic_playground.py`.
 The README is the usage entry point. Detailed v1/v2 data is retained in
 [the linear verification report](LINEAR_RESULTS.md).
 
-## Further research features
+## Plans recorded at the v3 milestone
 
 1. High-order integrated-Legendre basis with p-convergence verification.
 2. Hierarchical overlay refinement and gradient-jump error indicators.

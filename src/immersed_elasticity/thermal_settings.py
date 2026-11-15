@@ -68,3 +68,26 @@ def thermal_settings(supplied=None):
     if result["supports"] not in ("symmetry", "minimal"):
         raise ValueError("Supports must be symmetry or minimal.")
     return result
+
+
+def settings_from_saved(saved):
+    """Read current inputs or the flat settings format from the v4 checkpoints."""
+    if not isinstance(saved, dict):
+        raise ValueError("Saved settings must be a JSON object.")
+    if "inputs" in saved:
+        return thermal_settings(saved["inputs"])
+    if "conductivity_W_per_mm_K" not in saved:
+        return thermal_settings(saved)
+    supports = saved.get("supports", "symmetry")
+    if supports == "left ux=0; bottom uy=0":
+        supports = "symmetry"
+    reference = saved["reference_temperature_C"]
+    return thermal_settings(dict(
+        geometry=saved["geometry"], material=saved["material"],
+        thickness=saved["thickness_mm"], conductivity=saved["conductivity_W_per_mm_K"],
+        expansion_coefficient=saved["expansion_coefficient_per_K"], supports=supports,
+        loading=dict(reference_temperature=reference, left_temperature=saved.get("left_temperature_C", reference),
+                     right_temperature=saved["right_temperature_C"], heating_time=saved["heating_time_s"],
+                     hold_time=saved["hold_time_s"], steps_per_second=saved["steps_per_second"]),
+        quadrature=dict(method=saved.get("mechanical_method", "quadtree"), depth=saved["depth"], alpha=saved["alpha"]),
+        properties=dict(elasticity=saved.get("elasticity", "constant"), hardening=saved.get("hardening", "constant"))))

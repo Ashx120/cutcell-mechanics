@@ -1,0 +1,4 @@
+{
+  "solver_baseline": "5f4f1b55262f04c824d9c50f73a6c040f3dcfd0f",
+  "description": "Selected independently generated v4 numerical snapshots. Inputs are in each settings.json. Presentation plots regenerated for the final release. Not experimental data or source-paper figures."
+}

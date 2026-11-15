@@ -41,4 +41,4 @@ jobs:
       - run: python -m pip install dist/*.whl
       - name: Import installed package outside the checkout
         working-directory: ${{ runner.temp }}
-        run: python -c "from immersed_elasticity.nonlinear_solver import NonlinearModel; from immersed_elasticity.viscoplasticity import J2Material; print(J2Material())"
+        run: python -c "from immersed_elasticity.nonlinear_solver import NonlinearModel; from immersed_elasticity.thermal import solve_stationary_heat; from immersed_elasticity.thermal_settings import thermal_settings; from immersed_elasticity.viscoplasticity import J2Material; print(J2Material()); print(thermal_settings()['supports'])"

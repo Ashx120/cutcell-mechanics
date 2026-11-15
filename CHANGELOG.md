@@ -1,9 +1,32 @@
 # Changelog
 
 User-facing changes are grouped by source release and development milestone.
-Version 0.3.0 records the verified v3 source baseline.
+Versions 0.3.0 and 0.4.0 record the v3 and v4 source milestones.
 
 ## Unreleased
+
+## [0.4.0] - 2026-11-15
+
+### Added
+
+- Added stationary Q4 conduction, including quadtree cut cells and heat-balance checks.
+- Added constant-property thermoelastic coupling and analytical rectangle checks.
+- Connected prescribed nodal temperature histories to plane-stress viscoplasticity.
+- Added optional paper elastic/hardening fits with matched frozen-property controls.
+- Added mechanical moment fitting with a shared quadtree temperature field.
+- Recorded mesh, integration, fictitious-conductivity, time, and support sensitivity.
+- Added v4 walkthrough, results/limitations, property provenance, and saved run metadata.
+- Added thermal_playground.py as the editable v4 entry point with validated inputs,
+  configurable geometry/properties/supports/timing, saved settings, and output guards.
+- Initial-yield temperature coefficients remain unresolved; transient conduction,
+  and plastic heating are not implemented.
+
+### Verified
+
+- 89 automated tests, including analytical limits, equilibrium, plastic history,
+  input validation, and the editable thermal workflow.
+- Default thermal playground reproduces the previously verified fitted history.
+- Recorded one-way thermal studies and explicit limits of local stress/timing claims.
 
 ## [0.3.0] - 2026-11-12
 

@@ -35,12 +35,42 @@ python -m venv .venv
 .\.venv\Scripts\python.exe -m pytest -q
 ```
 
-The suite contains **38 tests**. Activation is optional because these commands
+The suite contains **89 tests** on the v4 development branch. Activation is optional because these commands
 use the environment's Python explicitly. On Linux/macOS, substitute
 `.venv/bin/python` for `.\.venv\Scripts\python.exe`. For recorded dependency
 versions, install `requirements-lock.txt` before installing the package with
 `--no-deps`. Existing users can keep their environment and rerun the editable
 installation after updating package metadata. Run commands from the project root.
+
+## V4 development: thermomechanics
+
+The v4 source milestone is version `0.4.0` (tag `v0.4.0`). It adds stationary conduction,
+thermal expansion, thermal viscoplastic histories, and optional temperature-dependent
+elasticity and hardening. Its development branch is `v4-thermomechanics`;
+v3 remains preserved at `v0.3.0` and on `v3-viscoplasticity`.
+
+Edit [thermal_playground.py](thermal_playground.py) for all v4 thermal inputs, then run:
+
+```powershell
+.\.venv\Scripts\python.exe thermal_playground.py
+```
+
+The default runs the verified 16 x 16 restrained-heating example with temperature-
+dependent elasticity/hardening, moment-fitted mechanics, and 0.025 s increments.
+Expect about one to two minutes, depending on hardware. Settings, metrics, CSV
+data, and plots are saved to `results/playground/v4/`. Change `OUTPUT_DIR` to keep
+earlier runs or explicitly set `OVERWRITE_OUTPUT=True` to replace them.
+
+Follow the [v4 walkthrough](docs/V4_WALKTHROUGH.md) for small verification cases
+and matched plate commands. Read [v4 results and limitations](docs/V4_RESULTS.md)
+for sensitivity studies, the support-driven hotspot, and the quadrature comparison.
+The [material-property notes](docs/V4_MATERIAL_PROPERTIES.md) give fit provenance
+and explain which parameters remain fixed.
+
+The thermal example is **one-way coupling through prescribed equilibrium temperature
+snapshots**, with an approximately insulated hole. Initial-yield softening,
+transient conduction, and plastic heating are not implemented. The original
+`playground.py` continues to run v3; `thermal_playground.py` runs v4.
 
 ## Run v3
 

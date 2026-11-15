@@ -25,6 +25,7 @@ builds an installable wheel.
 ## Where changes belong
 
 - `playground.py` is the primary editable v3 interface. It calls the shared runner.
+- `thermal_playground.py` is the primary editable v4 thermal interface.
 - `src/immersed_elasticity/` contains reusable numerical and input-handling code.
 - `scripts/` contains thin runnable experiments and comparisons.
 - `examples/` contains optional command-line input configurations.

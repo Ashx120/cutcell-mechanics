@@ -2,8 +2,8 @@ cff-version: 1.2.0
 message: "If you use this code or its results, please cite this software and identify the commit used."
 type: software
 title: "CutCell Mechanics"
-version: "0.3.0"
-date-released: 2026-11-12
+version: "0.4.0"
+date-released: 2026-11-15
 authors:
   - family-names: Gupta
     given-names: Shrey
@@ -12,8 +12,10 @@ url: "https://github.com/Ashx120/cutcell-mechanics"
 license: MIT
 abstract: >-
   A research portfolio implementation of Q4 immersed plane-stress elasticity
-  and isothermal J2 Perzyna viscoplasticity, comparing adaptive quadtree and
-  non-negative moment-fitted quadrature through reproducible verification studies.
+  and J2 Perzyna viscoplasticity with one-way stationary thermal coupling,
+  comparing quadtree and non-negative moment-fitted mechanical quadrature
+  through reproducible verification studies. Selected temperature-dependent
+  elastic and hardening fits are supported; the full paper model is not replicated.
 keywords:
   - computational mechanics
   - finite elements

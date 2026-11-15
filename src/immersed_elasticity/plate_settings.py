@@ -21,11 +21,14 @@ DEFAULT_SETTINGS = {
 }
 
 
-def load_plate_settings(path=None):
+def load_plate_settings(path=None, *, supplied=None):
     """Merge a partial JSON configuration into defaults and reject unknown keys."""
     settings = deepcopy(DEFAULT_SETTINGS)
+    if path is not None and supplied is not None:
+        raise ValueError("Supply a configuration file or settings object, not both.")
     if path is not None:
         supplied = json.loads(Path(path).read_text(encoding="utf-8"))
+    if supplied is not None:
         if not isinstance(supplied, dict):
             raise ValueError("Configuration must be a JSON object.")
         for key, value in supplied.items():

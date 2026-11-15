@@ -49,11 +49,17 @@ to recognise the difference between numerical agreement and physical accuracy.
 
 Edit **[config.py](config.py)**, save, and run the same command again.
 
+Set `MODE = "thermal"` for heating or `MODE = "displacement"` for the tensile
+load-and-hold example. Both use the same geometry, material, and quadrature settings.
+The two former root playgrounds have been merged into this file.
+
 | Settings | What you control |
 |---|---|
+| `MODE` | Thermal or displacement-controlled loading |
 | `GEOMETRY` | Plate dimensions, hole radius, and mesh resolution |
 | `MATERIAL`, `PROPERTIES` | Elastic/plastic parameters and selected temperature-dependent fits |
-| `LOADING` | Reference/reservoir temperatures, heating duration, hold, and time steps |
+| `THERMAL_LOADING` | Reservoir temperatures, heating duration, hold, and time steps |
+| `DISPLACEMENT_LOADING` | Right-edge displacement, loading/hold durations, and increments |
 | `SUPPORTS` | Restrained edges or only whole-body motion prevention |
 | `QUADRATURE` | Quadtree or moment fitting, integration depth, fictitious factor |
 | `THICKNESS`, `CONDUCTIVITY`, `EXPANSION_COEFFICIENT` | Thickness and thermal parameters |
@@ -106,7 +112,7 @@ Windows/Linux on Python 3.11/3.12 and builds/imports the package wheel.
 
 Reusable numerical code is under `src/immersed_elasticity/`, experiment runners
 under `scripts/`, checks under `tests/`, and explanations under `docs/`. Older
-playgrounds remain compatible examples. [The technical guide](docs/DEVELOPMENT.md)
+checkpoint scripts remain available. [The technical guide](docs/DEVELOPMENT.md)
 maps the files and preserved milestones; new users can start with run.py alone.
 
 Code and documentation use the [MIT License](LICENSE). The referenced paper

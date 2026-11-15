@@ -20,7 +20,7 @@ selected, simplified subset of its methods.
 | Temperature-dependent K/G and hardening | Matched frozen-property controls; initial yield and viscosity fixed |
 | Mechanical moment fitting | Shared thermal field, fewer physical history points, close nodal/history agreement |
 | Initial-yield temperature fit | Unresolved coefficients; no invented curve |
-| Unified v4 playground | thermal_playground.py, validated inputs, saved settings, plots, overwrite protection |
+| Unified configuration | Both playgrounds merged into config.py; run.py selects thermal/displacement loading |
 
 ## Perforated stationary conduction
 

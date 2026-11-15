@@ -25,7 +25,7 @@ builds an installable wheel.
 ## Where changes belong
 
 - `run.py` is the public entry point; `config.py` holds the editable inputs.
-- `playground.py` and `thermal_playground.py` retain the v3/v4 development examples.
+- `config.py` selects thermal or displacement loading; the original playgrounds remain in the milestone tags.
 - `src/immersed_elasticity/` contains reusable numerical and input-handling code.
 - `scripts/` contains thin runnable experiments and comparisons.
 - `examples/` contains optional command-line input configurations.

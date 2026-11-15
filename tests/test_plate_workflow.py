@@ -75,25 +75,35 @@ def test_configurable_cli_workflow_and_overwrite_protection(tmp_path):
     assert (comparison / "reaction_comparison.png").is_file()
 
 
-def test_v3_playground_uses_its_editable_settings(tmp_path, monkeypatch):
-    import playground
+def test_displacement_mode_uses_its_editable_settings(tmp_path, monkeypatch):
+    import config as playground
+    import run
+    monkeypatch.setattr(playground, "MODE", "displacement")
 
     monkeypatch.setattr(playground, "GEOMETRY", dict(nx=2, ny=1, length=3, height=2, radius=0))
     monkeypatch.setattr(playground, "THICKNESS", 2.)
     monkeypatch.setattr(playground, "MATERIAL", {**playground.MATERIAL, "initial_yield": 1e9})
-    monkeypatch.setattr(playground, "LOADING", dict(peak_displacement=.0001, loading_time=.25,
+    monkeypatch.setattr(playground, "DISPLACEMENT_LOADING", dict(peak_displacement=.0001, loading_time=.25,
                                                  hold_time=.5, steps_per_phase=1))
-    monkeypatch.setattr(playground, "OUTPUT_DIR", tmp_path / "playground")
-    playground.main([])
-    saved = json.loads((playground.OUTPUT_DIR / "settings.json").read_text())
+    output = tmp_path / "displacement"
+    run.main(["--output", str(output)])
+    saved = json.loads((output / "settings.json").read_text())
     assert saved["geometry"] == playground.GEOMETRY
-    assert saved["loading"] == playground.LOADING
-    history = np.genfromtxt(playground.OUTPUT_DIR / "history.csv", delimiter=",", names=True)
+    assert saved["loading"] == playground.DISPLACEMENT_LOADING
+    history = np.genfromtxt(output / "history.csv", delimiter=",", names=True)
     np.testing.assert_allclose(history["right_force_N"][1:], 28, atol=1e-7)
+    monkeypatch.setattr(playground, "MODE", "thermal")
+    replay = tmp_path / "replayed-displacement"
+    run.main(["--config", str(output / "settings.json"), "--output", str(replay)])
+    replayed = np.genfromtxt(replay / "history.csv", delimiter=",", names=True)
+    np.testing.assert_allclose(replayed["right_force_N"][1:], 28, atol=1e-7)
     with pytest.raises(SystemExit):
-        playground.main([])
-    playground.main(["--steps", "2", "--output", str(tmp_path / "override")])
-    assert playground.LOADING["steps_per_phase"] == 1
+        run.main(["--config", str(output / "settings.json"), "--mode", "thermal"])
+    monkeypatch.setattr(playground, "MODE", "displacement")
+    with pytest.raises(SystemExit):
+        run.main(["--output", str(output)])
+    run.main(["--mode", "displacement", "--steps", "2", "--output", str(tmp_path / "override")])
+    assert playground.DISPLACEMENT_LOADING["steps_per_phase"] == 1
     assert json.loads((tmp_path / "override/settings.json").read_text())["loading"]["steps_per_phase"] == 2
 
 

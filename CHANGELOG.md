@@ -6,6 +6,12 @@ verified numerical scope as the final portfolio presentation release.
 
 ## Unreleased
 
+## [1.1.1] - 2026-11-15
+
+- Merged both root playgrounds into config.py with thermal/displacement mode selection.
+- Unified execution and saved-input replay through run.py; removed duplicate settings files.
+- Reworded main-branch commit subjects in past tense; preserved tagged release history.
+
 ## [1.1.0] - 2026-11-15
 
 ### Added

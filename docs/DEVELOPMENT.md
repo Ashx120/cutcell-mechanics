@@ -1,8 +1,9 @@
 # Technical and development guide
 
 New users should start with [GETTING_STARTED.md](GETTING_STARTED.md).
-The public path is `run.py` -> `config.py` -> the shared thermal runner. The
-older playgrounds remain compatible examples; they are not required for first use.
+The public path is `run.py` -> `config.py` -> the selected shared runner.
+MODE chooses thermal or displacement loading. The two former root playgrounds
+are merged into config.py; their original files remain in the milestone tags.
 
 ## Code map
 
@@ -46,9 +47,9 @@ Prefix script names with `.\.venv\Scripts\python.exe` on Windows.
 | `scripts/check_temperature_hardening.py` | Hardening property-fit checkpoint |
 | `scripts/compare_thermal_runs.py` | Shared-node/shared-time thermal comparison |
 
-Use `--help` for script options. `playground.py` remains the isothermal displacement-
-loading example; `thermal_playground.py` retains the v4 editable example;
-`scripts/elastic_playground.py` retains the original linear-elastic example.
+Use `--help` for script options. Set MODE in config.py for thermal or isothermal
+displacement loading. `scripts/elastic_playground.py` remains an advanced
+linear-elastic verification example.
 
 For earlier isothermal comparisons, use `scripts/nonlinear_plate.py` with
 `examples/nonlinear_plate.json`, then `scripts/compare_nonlinear_histories.py`.

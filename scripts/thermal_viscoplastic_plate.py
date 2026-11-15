@@ -169,6 +169,7 @@ def main(argv=None, *, initial_settings=None, output=None, overwrite=False):
         "See docs/GETTING_STARTED.md and docs/MODEL.md for interpretation and limits.\n")
     (args.output / "summary.txt").write_text(summary, encoding="utf-8")
     print(f"Saved results to {args.output.resolve()}\nOpen summary.txt, history.png, and fields.png first.")
+    return args.output
 
 
 if __name__ == "__main__":

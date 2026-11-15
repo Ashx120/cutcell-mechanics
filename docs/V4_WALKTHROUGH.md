@@ -3,15 +3,17 @@
 V4 is the `v0.4.0` source milestone, developed on `v4-thermomechanics`.
 The broader beginner-facing cleanup will follow as a separate final-release stage.
 Run commands from the repository root using the installed virtual environment.
-The root `playground.py` still runs v3. Use `thermal_playground.py` for v4.
+The current interface combines both original playgrounds in config.py. Set
+MODE="thermal" and run run.py for this workflow, or MODE="displacement" for
+the earlier tensile example. Original playground files remain in the milestone tags.
 
 ## Edit v4 inputs in one place
 
 ```powershell
-.\.venv\Scripts\python.exe thermal_playground.py
+.\.venv\Scripts\python.exe run.py --mode thermal
 ```
 
-Edit its settings block and rerun the same command:
+Edit config.py and rerun the same command:
 
 | Setting | Meaning |
 |---|---|
@@ -19,15 +21,16 @@ Edit its settings block and rerun the same command:
 | `MATERIAL` | E, nu, initial yield, hardening, and viscosity parameters |
 | `THICKNESS`, `CONDUCTIVITY` | mm and W/(mm K) |
 | `EXPANSION_COEFFICIENT` | Constant thermal expansion per K |
-| `LOADING` | Reference/reservoir temperatures, ramp/hold durations, increments per second |
+| `THERMAL_LOADING` | Reference/reservoir temperatures, ramp/hold durations, increments per second |
 | `PROPERTIES` | Constant, paper-reference, or paper-temperature elastic/hardening modes |
 | `QUADRATURE` | Mechanical method, depth, and fictitious factor alpha |
 | `SUPPORTS` | Symmetry rollers or minimal rigid-motion constraints |
-| `OUTPUT_DIR`, `OVERWRITE_OUTPUT` | Save location and explicit replacement option |
+| `OUTPUT_ROOT` | Parent folder for independent runs |
 
-The default matches the verified 16 x 16 fitted thermal case, with both property
-fits active and dt=0.025 s. It usually takes around one to two minutes. Outputs
-go to `results/playground/v4/`. Paper property modes replace the corresponding
+The current default is a coarse 8 x 8 constant-property case. Replay
+results/reference/thermal/fitted/settings.json with --config to reproduce the
+16 x 16 temperature-dependent comparison. New outputs get separate folders
+under results/runs/. Paper property modes replace the corresponding
 MATERIAL constants, as explained in the comments; initial yield/viscosity remain
 fixed. Settings are validated before solving and saved under `inputs` in
 settings.json. CLI overrides remain available through `--help`.

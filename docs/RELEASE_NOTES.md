@@ -1,4 +1,11 @@
-# CutCell Mechanics 1.1.0
+# CutCell Mechanics 1.1.1
+
+Both playgrounds are now merged into config.py. Set MODE to thermal or
+displacement and run run.py. Geometry, material, thickness, and quadrature are
+shared; the loading blocks are mode specific. Saved configurations reopen in
+their original mode. The duplicate root playground files have been removed.
+Main-branch commit messages describe completed work in past tense; older tags
+retain their original histories.
 
 This release packages the verified v4 numerical scope as a usable, documented
 portfolio project. Start with `python run.py`, edit `config.py`, and inspect the
@@ -25,6 +32,7 @@ The plastic hotspot is restraint dependent and is not established as mesh conver
 See docs/MODEL.md and docs/RESULTS.md for assumptions, evidence, and limits.
 
 Earlier milestones remain available at v0.4.0, v0.3.0, and the original elastic
-v1.0.0 tag. This release is v1.1.0 to preserve that existing tag history. Code and
+v1.0.0 tag. The presentation release used v1.1.0 to preserve that history;
+v1.1.1 consolidates its settings interface. Code and
 documentation remain MIT licensed. The project retains its brief AI-assistance
 disclosure. This is a GitHub/source release, not a package-index publication.

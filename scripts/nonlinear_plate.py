@@ -26,9 +26,9 @@ from immersed_elasticity.plate_settings import load_plate_settings, validate_pla
 def main(argv=None, *, initial_settings=None, output=None, overwrite=False):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, help="Editable JSON input file; CLI options override its settings.")
-    parser.add_argument("--mesh", type=int, help="Override nx and ny (default: 6).")
-    parser.add_argument("--depth", type=int, help="Override quadrature depth (default: 2).")
-    parser.add_argument("--steps", type=int, help="Override increments per loading/hold phase (default: 10).")
+    parser.add_argument("--mesh", type=int, help="Override nx and ny from the settings.")
+    parser.add_argument("--depth", type=int, help="Override quadrature depth from the settings.")
+    parser.add_argument("--steps", type=int, help="Override increments per loading/hold phase.")
     parser.add_argument("--output", type=Path, default=output if output is not None else Path("results/walkthrough/v3-plate"))
     parser.add_argument("--overwrite", action="store_true", default=overwrite,
                         help="Replace an existing run in the output folder.")
@@ -140,6 +140,7 @@ def main(argv=None, *, initial_settings=None, output=None, overwrite=False):
     print(f"Plane-stress updates: {model.plane_stress_updates}; global evaluations: {model.evaluations}")
     print(f"Setup: {setup_seconds:.3f} s; solve: {solve_seconds:.3f} s (single-run timings)")
     print(f"Saved history, strain samples, plots, and metrics to {args.output}")
+    return args.output
 
 
 if __name__ == "__main__":

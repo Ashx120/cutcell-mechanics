@@ -76,6 +76,24 @@ a coloured hotspot as a reliable physical prediction.
 
 Open `config.py`, edit a setting, save, and run `run.py` again.
 
+`MODE = "thermal"` selects the heating example described above. Set
+`MODE = "displacement"` to run the original tensile load-and-hold example instead.
+That mode uses DISPLACEMENT_LOADING: the right edge moves horizontally, while
+left ux and bottom uy stay fixed. It ignores the thermal-only property/support
+settings and uses the constant MATERIAL values. Its main plots are response.png
+(reaction force versus time/displacement) and plastic_strain.png. summary.txt
+explains which files to open. No second playground file is needed.
+
+You can also select the mode from the command line:
+
+```powershell
+.\.venv\Scripts\python.exe run.py --mode displacement
+.\.venv\Scripts\python.exe run.py --mode thermal
+```
+
+Saved configurations select their own loading mode when replayed. An explicit
+conflicting --mode is rejected rather than silently changing the experiment.
+
 1. Change `right_temperature` from 320 to 120. Expect less thermal loading and
    potentially no plastic accumulation.
 2. Return to 320 and change `SUPPORTS` to `"minimal"`. This releases edge

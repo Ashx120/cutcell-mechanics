@@ -1,6 +1,6 @@
 # CutCell Mechanics
 
-**Explore how heating deforms a plate with a hole—and how fewer integration points can give nearly the same answer.**
+**Thermal expansion, viscoplasticity, and moment-fitted integration in Python.**
 
 [![Verification](https://github.com/Ashx120/cutcell-mechanics/actions/workflows/tests.yml/badge.svg)](https://github.com/Ashx120/cutcell-mechanics/actions/workflows/tests.yml)
 [![Python](https://img.shields.io/badge/Python-3.11%2B-blue)](pyproject.toml)
@@ -8,23 +8,19 @@
 
 [Start here](docs/GETTING_STARTED.md) · [Results](docs/RESULTS.md) · [Model and limits](docs/MODEL.md) · [Technical guide](docs/DEVELOPMENT.md)
 
-CutCell Mechanics is a Python computational-mechanics portfolio project. It
-simulates a thin plate that expands as one side is heated. Supports resist part
-of that expansion, creating stress; time-dependent plastic deformation can then
-relax that stress while temperatures stay fixed.
-
-The numerical question is whether **non-negative moment fitting** can reduce
-the number of integration points where material behaviour is evaluated while
-retaining close agreement with a quadtree reference. You can run and modify the
-example without first learning the finite element method (FEM).
+CutCell Mechanics models how a thin plate with a hole expands and develops
+stress under heating. It uses a Cartesian finite-element mesh and compares
+quadtree integration with non-negative moment fitting. The examples cover
+elastic response, plastic deformation, and stress relaxation during a temperature hold.
 
 **This is an AI-assisted computational mechanics project.**
 
-![Final temperature, stress, and plastic strain in the recorded 16 x 16 example](docs/images/reference/fields.png)
+![Temperature and elastic von Mises stress on a 64 x 64 mesh](docs/images/reference/fields64.png)
 
-These are project-generated physical integration-point samples from the finer
-recorded example. The starter run is coarser. Colour scales differ by field;
-the local stress/strain peaks have not been established as mesh converged.
+64 x 64 thermoelastic example: left edge 20 C, right edge 120 C, with left-x
+and bottom-y rollers. This figure uses constant properties and an elastic model.
+The nonlinear quadrature comparison below is a separate 16 x 16 case. The
+starter is coarser, and local stress peaks have not been established as mesh converged.
 
 ## Run your first example
 

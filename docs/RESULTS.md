@@ -54,7 +54,18 @@ Each solve creates a new output folder. Expect roughly one to two minutes per
 run on the development machine. These finer runs differ from the coarse starter
 configuration in config.py; do not compare their maxima as if inputs were equal.
 
-## Interpret the example
+## README illustration
+
+The README shows the 64 x 64 constant-property thermoelastic case, with a 20 C
+left edge, 120 C right edge, and left-x/bottom-y rollers. Its sampled peak von
+Mises stress is 113.672490 MPa and mean right-edge ux is 0.002563755 mm.
+It is separate from the nonlinear quadrature comparison above. Reproduce it with:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/thermoelastic_plate.py --mesh 64 --output results/runs/readme-mesh64
+```
+
+## Interpret the nonlinear example
 
 ![Heating schedule, stress relaxation, and plastic strain history](images/reference/history.png)
 
